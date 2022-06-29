@@ -17,7 +17,7 @@ const createData = async () => {
     return q;
   });
   let data = JSON.parse(fs.readFileSync("db.json"));
-  data.pokemons = newData;
+  data.data = newData;
   fs.writeFileSync("db.json", JSON.stringify(data));
 };
 createData();
