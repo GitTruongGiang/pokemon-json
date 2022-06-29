@@ -4,7 +4,7 @@ const fs = require("fs");
 const crypto = require("crypto");
 
 router.get("/pokemons", (req, res, next) => {
-  const allowfilter = ["name", "types", "page", "limit", "id"];
+  const allowfilter = ["search", "types", "page", "limit", "id"];
   try {
     let { page, limit, ...filterquery } = req.query;
     page = parseInt(page) || 1;
@@ -29,7 +29,7 @@ router.get("/pokemons", (req, res, next) => {
     if (filterkey.length) {
       result = result.length
         ? result.filter((e) => {
-            if (e.name === filterquery.name) {
+            if (e.name === filterquery.search) {
               return e;
             }
             if (e.types.find((e) => e === filterquery.types)) {
@@ -40,7 +40,7 @@ router.get("/pokemons", (req, res, next) => {
             }
           })
         : data.filter((e) => {
-            if (e.name === filterquery.name) {
+            if (e.name === filterquery.search) {
               return e;
             }
             if (e.types.find((e) => e === filterquery.types)) {
