@@ -4,10 +4,10 @@ const fs = require("fs");
 const crypto = require("crypto");
 
 /* GET home page. */
-
+const createData = require("./createData");
 router.get("/", (req, res, next) => {
+  createData();
   const allowfilter = ["name", "types"];
-
   try {
     let { ...filterquery } = req.query;
     let filterkey = Object.keys(filterquery);
