@@ -11,7 +11,7 @@ const createData = async () => {
     const q = {
       name: e.Name,
       types: [type1, type2],
-      url: `http://localhost:8000/pokemon/${id}.png`,
+      url: `https://pokemon-data-json.herokuapp.com/pokemon/${id}.png`,
       id: id++,
     };
     return q;

@@ -88,21 +88,21 @@ router.post("/pokemons", (req, res, next) => {
   }
 });
 
-router.delete("/pokemons/:pokemonId", (req, res, next) => {
+router.delete("/pokemons/:id", (req, res, next) => {
   try {
-    const { pokemonId } = req.params;
+    const { id } = req.params;
     let db = fs.readFileSync("db.json", "utf-8");
     db = JSON.parse(db);
     const { data, totalPokemon } = db;
     const targetIndex = data.findIndex(
-      (pokemon) => pokemon.id === parseInt(pokemonId)
+      (pokemon) => pokemon.id === parseInt(id)
     );
     if (targetIndex < 0) {
       const exception = new Error(`Book not found`);
       exception.statusCode = 404;
       throw exception;
     }
-    db.data = data.filter((pokemon) => pokemon.id !== parseInt(pokemonId));
+    db.data = data.filter((pokemon) => pokemon.id !== parseInt(id));
     db.totalPokemon = data.length - 1;
     db = JSON.stringify(db);
     fs.writeFileSync("db.json", db);
