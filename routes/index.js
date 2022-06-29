@@ -3,15 +3,13 @@ var router = express.Router();
 const fs = require("fs");
 const crypto = require("crypto");
 
-// /* GET home page. */
-// const createData = require("./createData");
-router.get("/", (req, res, next) => {
-  // createData();
-  const allowfilter = ["name", "types"];
+router.get("/pokemons", (req, res, next) => {
+  const allowfilter = ["name", "types", "page", "limit", "id"];
   try {
-    let { ...filterquery } = req.query;
+    let { page, limit, ...filterquery } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 20;
     let filterkey = Object.keys(filterquery);
-    console.log();
     filterkey.forEach((key) => {
       if (!allowfilter.includes(key)) {
         const exception = new Error(`Query ${key} is not allowed`);
@@ -20,10 +18,13 @@ router.get("/", (req, res, next) => {
       }
       if (!filterquery[key]) delete filterquery[key];
     });
-    let data = JSON.parse(fs.readFileSync("db.json", "utf-8"));
-    const { pokemons } = data;
+    let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
+    const { data, totalPokemon } = pokemonData;
+    let offset = (page - 1) * limit;
+    let totalPage = Math.ceil(totalPokemon / limit);
+    let newData = data.slice(offset, offset + limit);
     let result = [];
-    result = pokemons;
+    result = newData;
 
     if (filterkey.length) {
       result = result.length
@@ -38,7 +39,7 @@ router.get("/", (req, res, next) => {
               return e;
             }
           })
-        : pokemons.filter((e) => {
+        : data.filter((e) => {
             if (e.name === filterquery.name) {
               return e;
             }
@@ -50,33 +51,13 @@ router.get("/", (req, res, next) => {
             }
           });
     }
-    res.status(200).send(result);
+    res.status(200).send({ result, totalPage: totalPage });
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/", (req, res, next) => {
-  const pokemonTypes = [
-    "bug",
-    "dragon",
-    "fairy",
-    "fire",
-    "ghost",
-    "ground",
-    "normal",
-    "psychic",
-    "steel",
-    "dark",
-    "electric",
-    "fighting",
-    "flyingText",
-    "grass",
-    "ice",
-    "poison",
-    "rock",
-    "water",
-  ];
+router.post("/pokemons", (req, res, next) => {
   try {
     const { name, types, url } = req.body;
     if (!name || !types || !url) {
@@ -89,44 +70,42 @@ router.post("/", (req, res, next) => {
       exception.statusCode = 401;
       throw exception;
     }
-
-    let data = JSON.parse(fs.readFileSync("db.json", "utf-8"));
-    const { pokemons } = data;
-
+    let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
+    const { data, totalPokemon } = pokemonData;
     const newPokemon = {
       name,
       types,
       url,
-      id: pokemons.length + 1,
+      id: data.length + 1,
     };
-    pokemons.push(newPokemon);
-    data.pokemons = pokemons;
-    fs.writeFileSync("db.json", JSON.stringify(data));
-    res.status(200).send(pokemons);
+    data.push(newPokemon);
+    pokemonData.totalPokemon = data.length;
+    pokemonData.data = data;
+    fs.writeFileSync("db.json", JSON.stringify(pokemonData));
+    res.status(200).send(newPokemon);
   } catch (error) {
     next(error);
   }
 });
 
-router.delete("/:pokemonId", (req, res, next) => {
+router.delete("/pokemons/:pokemonId", (req, res, next) => {
   try {
     const { pokemonId } = req.params;
-    let data = JSON.parse(fs.readFileSync("db.json", "utf-8"));
-    const { pokemons } = data;
-
-    const targetIndex = pokemons.findIndex(
-      (pokemon) => pokemon.id === Number(pokemonId)
+    let db = fs.readFileSync("db.json", "utf-8");
+    db = JSON.parse(db);
+    const { data, totalPokemon } = db;
+    const targetIndex = data.findIndex(
+      (pokemon) => pokemon.id === parseInt(pokemonId)
     );
     if (targetIndex < 0) {
       const exception = new Error(`Book not found`);
       exception.statusCode = 404;
       throw exception;
     }
-    data.pokemons = pokemons.filter(
-      (pokemon) => pokemon.id !== Number(pokemonId)
-    );
-
-    fs.writeFileSync("db.json", JSON.stringify(data));
+    db.data = data.filter((pokemon) => pokemon.id !== parseInt(pokemonId));
+    db.totalPokemon = data.length - 1;
+    db = JSON.stringify(db);
+    fs.writeFileSync("db.json", db);
     res.status(200).send({});
   } catch (error) {
     next(error);
