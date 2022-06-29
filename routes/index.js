@@ -51,7 +51,7 @@ router.get("/pokemons", (req, res, next) => {
             }
           });
     }
-    res.status(200).send({ result, totalPage: totalPage });
+    res.status(200).send({ data: result, totalPage: totalPage });
   } catch (error) {
     next(error);
   }
