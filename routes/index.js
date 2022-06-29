@@ -3,10 +3,10 @@ var router = express.Router();
 const fs = require("fs");
 const crypto = require("crypto");
 
-/* GET home page. */
-const createData = require("./createData");
+// /* GET home page. */
+// const createData = require("./createData");
 router.get("/", (req, res, next) => {
-  createData();
+  // createData();
   const allowfilter = ["name", "types"];
   try {
     let { ...filterquery } = req.query;

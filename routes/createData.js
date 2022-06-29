@@ -20,5 +20,6 @@ const createData = async () => {
   data.pokemons = newData;
   fs.writeFileSync("db.json", JSON.stringify(data));
 };
+createData();
 
-module.exports = createData;
+// module.exports = createData;
