@@ -24,7 +24,7 @@ router.get("/pokemons", (req, res, next) => {
     let totalPage = Math.ceil(totalPokemon / limit);
     let newData = data.slice(offset, offset + limit);
     let result = [];
-    result = newData;
+    result = data;
 
     if (filterkey.length) {
       result = result.length
@@ -51,7 +51,9 @@ router.get("/pokemons", (req, res, next) => {
             }
           });
     }
-    res.status(200).send({ data: result, totalPage: totalPage });
+    res
+      .status(200)
+      .send({ data: newData, listResult: result, totalPage: totalPage });
   } catch (error) {
     next(error);
   }
