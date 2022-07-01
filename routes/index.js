@@ -28,28 +28,32 @@ router.get("/pokemons", (req, res, next) => {
 
     if (filterkey.length) {
       result = result.length
-        ? result.filter((e) => {
-            if (e.name === filterquery.search) {
-              return e;
-            }
-            if (e.types.find((e) => e === filterquery.types)) {
-              return e;
-            }
-            if (e.id === parseInt(filterquery.id)) {
-              return e;
-            }
-          })
-        : data.filter((e) => {
-            if (e.name === filterquery.search) {
-              return e;
-            }
-            if (e.types.find((e) => e === filterquery.types)) {
-              return e;
-            }
-            if (e.id === parseInt(filterquery.id)) {
-              return e;
-            }
-          });
+        ? result
+            .filter((e) => {
+              if (e.name === filterquery.search) {
+                return e;
+              }
+              if (e.types.find((e) => e === filterquery.types)) {
+                return e;
+              }
+              if (e.id === parseInt(filterquery.id)) {
+                return e;
+              }
+            })
+            .slice(offset, offset + limit)
+        : data
+            .filter((e) => {
+              if (e.name === filterquery.search) {
+                return e;
+              }
+              if (e.types.find((e) => e === filterquery.types)) {
+                return e;
+              }
+              if (e.id === parseInt(filterquery.id)) {
+                return e;
+              }
+            })
+            .slice(offset, offset + limit);
     }
     res
       .status(200)
