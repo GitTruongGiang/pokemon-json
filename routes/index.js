@@ -23,6 +23,7 @@ router.get("/pokemons", (req, res, next) => {
     let offset = (page - 1) * limit;
     let totalPage = Math.ceil(totalPokemon / limit);
     let newData = data.slice(offset, offset + limit);
+
     let result = [];
     result = data;
 
@@ -30,10 +31,14 @@ router.get("/pokemons", (req, res, next) => {
       result = result.length
         ? result
             .filter((e) => {
-              if (e.name === filterquery.search) {
+              if (
+                e.types.find(
+                  (e) => e === filterquery.types && !filterquery.search
+                )
+              ) {
                 return e;
               }
-              if (e.types.find((e) => e === filterquery.types)) {
+              if (e.name === filterquery.search) {
                 return e;
               }
               if (e.id === parseInt(filterquery.id)) {
@@ -43,10 +48,14 @@ router.get("/pokemons", (req, res, next) => {
             .slice(offset, offset + limit)
         : data
             .filter((e) => {
-              if (e.name === filterquery.search) {
+              if (
+                e.types.find(
+                  (e) => e === filterquery.types && !filterquery.search
+                )
+              ) {
                 return e;
               }
-              if (e.types.find((e) => e === filterquery.types)) {
+              if (e.name === filterquery.search) {
                 return e;
               }
               if (e.id === parseInt(filterquery.id)) {
