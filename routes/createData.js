@@ -10,7 +10,7 @@ const createData = async () => {
     let type1 = type.type1 ? type.type1.toLowerCase() : null;
     let type2 = type.type2 ? type.type2.toLowerCase() : null;
     const q = {
-      heigth: faker.random.numeric(),
+      height: faker.random.numeric(),
       weight: `${faker.datatype.number({
         min: 10,
         max: 100,
