@@ -39,11 +39,11 @@ router.get("/pokemons", (req, res, next) => {
               ) {
                 return e;
               }
-              if (e.name === filterquery.search) {
-                return e;
-              }
               if (e.id === parseInt(filterquery.id)) {
                 return e;
+              }
+              if (filterquery.search) {
+                return e.name.toLocaleLowerCase().includes(filterquery.search);
               }
             })
             .slice(offset, offset + limit)
