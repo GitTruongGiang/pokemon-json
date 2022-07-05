@@ -17,7 +17,7 @@ const createData = async () => {
         precision: 0.01,
       })} lbs`,
       name: e.Name,
-      types: [type1, type2],
+      type: [type1, type2],
       url: `https://pokemon-data-json.herokuapp.com/pokemon/${id}.png`,
       id: id++,
     };
