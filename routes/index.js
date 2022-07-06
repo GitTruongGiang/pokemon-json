@@ -65,13 +65,13 @@ router.get("/pokemons/:id", (req, res, next) => {
     let prevPokemon = {};
     let index = data.findIndex((pokemon) => pokemon.id === parseInt(id));
     newData = data[index];
-    if (index < totalPokemon) {
+    if ((index !== 0) < totalPokemon - 1) {
       nextPokemon = data[index + 1];
       prevPokemon = data[index - 1];
     }
-    if (index === totalPokemon) {
-      index = 0;
-      nextPokemon = data[index];
+    if (index === totalPokemon - 1) {
+      nextPokemon = data[0];
+      prevPokemon = data[index - 1];
     }
     if (index === 0) {
       index = totalPokemon - 1;
