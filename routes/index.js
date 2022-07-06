@@ -3,27 +3,6 @@ var router = express.Router();
 const fs = require("fs");
 const crypto = require("crypto");
 
-const pokemonTypes = [
-  "bug",
-  "dragon",
-  "fairy",
-  "fire",
-  "ghost",
-  "ground",
-  "normal",
-  "psychic",
-  "steel",
-  "dark",
-  "electric",
-  "fighting",
-  "flyingText",
-  "grass",
-  "ice",
-  "poison",
-  "rock",
-  "water",
-];
-
 router.get("/pokemons", (req, res, next) => {
   const allowfilter = ["search", "type", "page", "limit", "id"];
   try {
@@ -79,10 +58,51 @@ router.get("/pokemons", (req, res, next) => {
 router.get("/pokemons/:id", (req, res, next) => {
   try {
     const id = req.params.id;
+    let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
+    const { data, totalPokemon } = pokemonData;
+    let newData = {};
+    let nextPokemon = {};
+    let prevPokemon = {};
+    let index = data.findIndex((pokemon) => pokemon.id === parseInt(id));
+    newData = data[index];
+    if (index < totalPokemon) {
+      nextPokemon = data[index + 1];
+      prevPokemon = data[index - 1];
+    }
+    if (index === totalPokemon) {
+      index = 0;
+      nextPokemon = data[index];
+    }
+    if (index === 0) {
+      index = totalPokemon - 1;
+      prevPokemon = data[index];
+    }
+    res.status(200).send({ pokemon: newData, nextPokemon, prevPokemon });
   } catch (error) {
     next(error);
   }
 });
+
+const pokemonTypes = [
+  "bug",
+  "dragon",
+  "fairy",
+  "fire",
+  "ghost",
+  "ground",
+  "normal",
+  "psychic",
+  "steel",
+  "dark",
+  "electric",
+  "fighting",
+  "flyingText",
+  "grass",
+  "ice",
+  "poison",
+  "rock",
+  "water",
+];
 
 router.post("/pokemons", (req, res, next) => {
   try {
@@ -97,13 +117,12 @@ router.post("/pokemons", (req, res, next) => {
       exception.statusCode = 401;
       throw exception;
     }
-    if (
-      //check valid types-- hash map
-      pokemonTypes.filter((e) => {
-        types.filter(() => {});
-      })
-    ) {
-    }
+    const type = {};
+    types.forEach((e) => {
+      type[e] = e;
+    });
+    console.log(type);
+
     let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
     const { data, totalPokemon } = pokemonData;
     const newPokemon = {
