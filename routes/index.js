@@ -3,6 +3,27 @@ var router = express.Router();
 const fs = require("fs");
 const crypto = require("crypto");
 
+const pokemonTypes = [
+  "bug",
+  "dragon",
+  "fairy",
+  "fire",
+  "ghost",
+  "ground",
+  "normal",
+  "psychic",
+  "steel",
+  "dark",
+  "electric",
+  "fighting",
+  "flyingText",
+  "grass",
+  "ice",
+  "poison",
+  "rock",
+  "water",
+];
+
 router.get("/pokemons", (req, res, next) => {
   const allowfilter = ["search", "type", "page", "limit", "id"];
   try {
@@ -83,27 +104,6 @@ router.get("/pokemons/:id", (req, res, next) => {
   }
 });
 
-const pokemonTypes = [
-  "bug",
-  "dragon",
-  "fairy",
-  "fire",
-  "ghost",
-  "ground",
-  "normal",
-  "psychic",
-  "steel",
-  "dark",
-  "electric",
-  "fighting",
-  "flyingText",
-  "grass",
-  "ice",
-  "poison",
-  "rock",
-  "water",
-];
-
 router.post("/pokemons", (req, res, next) => {
   try {
     const { name, types, url, id } = req.body; //types = [] => array, object:truthy
@@ -141,7 +141,7 @@ router.post("/pokemons", (req, res, next) => {
     const { data, totalPokemon } = pokemonData;
     const newPokemon = {
       name,
-      types,
+      type: types,
       url,
       id,
     };
