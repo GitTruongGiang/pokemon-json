@@ -143,9 +143,8 @@ router.post("/pokemons", (req, res, next) => {
       name,
       type: types,
       url,
-      id,
+      id: parseInt(id),
     };
-
     const existPokemon = data.find((e) => e.id === newPokemon.id);
     //existPokemon = undefined =>khoong trùng id
     //existPokemon = {} => trùng id
