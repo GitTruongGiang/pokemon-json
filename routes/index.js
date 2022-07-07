@@ -117,11 +117,25 @@ router.post("/pokemons", (req, res, next) => {
       exception.statusCode = 401;
       throw exception;
     }
-    const type = {};
-    types.forEach((e) => {
+    const pokeTypes = {}; // {bug: 'bug', dragon:"dragon", .... }
+    pokemonTypes.forEach((e) => {
+      pokeTypes[e] = e;
+    });
+
+    const newData = types.filter((e) => e === pokeTypes[e]); //["fire", "bug"]
+
+    const type = {}; //{fire: "fire", bug: "bug"}
+    newData.forEach((e) => {
       type[e] = e;
     });
-    console.log(type);
+
+    types.find((e) => {
+      if (e !== type[e]) {
+        const exception = new Error(`Pokémon’s type is invalid`);
+        exception.statusCode = 401;
+        throw exception;
+      }
+    });
 
     let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
     const { data, totalPokemon } = pokemonData;
