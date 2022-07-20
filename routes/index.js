@@ -49,6 +49,15 @@ router.get("/pokemons", (req, res, next) => {
     result = data;
 
     if (filterkey.length) {
+      // pokemonData.data = pokemonData.data.filter((poke) => {
+      //   const hasSearch = filterquery.search
+      //     ? poke.name.includes(filterquery.search.toLowerCase())
+      //     : true;
+      //   const hasType = filter.type
+      //     ? poke.type.includes(filterquery.type.toLowerCase())
+      //     : true;
+      //   return hasSearch && hasType;
+      // });
       if (filterquery.type) {
         result = result
           .filter((pokemon) => pokemon.type.find((e) => e === filterquery.type))
@@ -60,9 +69,7 @@ router.get("/pokemons", (req, res, next) => {
             if (pokemon.type.find((e) => e === filterquery.search)) {
               return pokemon;
             } else {
-              return pokemon.name
-                .toLocaleLowerCase()
-                .includes(filterquery.search);
+              return pokemon.name.toLowerCase().includes(filterquery.search);
             }
           })
           .slice(offset, offset + limit);
@@ -79,6 +86,7 @@ router.get("/pokemons", (req, res, next) => {
 router.get("/pokemons/:id", (req, res, next) => {
   try {
     const id = req.params.id;
+    console.log(req.query);
     let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
     const { data, totalPokemon } = pokemonData;
     let newData = {};
@@ -106,7 +114,7 @@ router.get("/pokemons/:id", (req, res, next) => {
 
 router.post("/pokemons", (req, res, next) => {
   try {
-    const { name, types, url, id } = req.body; //types = [] => array, object:truthy
+    const { name, types, url, id } = req.body;
     if (!name || !types.length || !url || !id) {
       const exception = new Error(`Missing required data`);
       exception.statusCode = 401;
@@ -122,7 +130,7 @@ router.post("/pokemons", (req, res, next) => {
       pokeTypes[e] = e;
     });
 
-    const newData = types.filter((e) => e === pokeTypes[e]); //["fire", "bug"]
+    const newData = types.filter((e) => e === pokeTypes[e]); //["fire","bug"]
 
     const type = {}; //{fire: "fire", bug: "bug"}
     newData.forEach((e) => {
@@ -146,9 +154,9 @@ router.post("/pokemons", (req, res, next) => {
       id: parseInt(id),
     };
     const existPokemon = data.find((e) => e.id === newPokemon.id);
-    //existPokemon = undefined =>khoong trùng id
-    //existPokemon = {} => trùng id
     if (existPokemon) {
+      const exception = new Error("The Pokémon already exists");
+      exception.status = 401;
       throw exception;
     }
     data.push(newPokemon);
@@ -171,7 +179,7 @@ router.delete("/pokemons/:id", (req, res, next) => {
       (pokemon) => pokemon.id === parseInt(id)
     );
     if (targetIndex < 0) {
-      const exception = new Error(`Book not found`);
+      const exception = new Error(`pokemons not found`);
       exception.statusCode = 404;
       throw exception;
     }
