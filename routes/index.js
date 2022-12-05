@@ -24,13 +24,17 @@ const pokemonTypes = [
   "water",
 ];
 
+router.get("/", function (req, res, next) {
+  res.status(200).send("Welcome to CoderSchool!");
+});
+
 router.get("/pokemons", (req, res, next) => {
-  const allowfilter = ["search", "type", "page", "limit", "id"];
+  const allowfilter = ["search", "type"];
   try {
     let { page, limit, ...filterquery } = req.query; //filterquery = {types:"fire"}
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 20;
-    let filterkey = Object.keys(filterquery);
+    let filterkey = Object.keys(filterquery); // ["search", "type"]
     filterkey.forEach((key) => {
       if (!allowfilter.includes(key)) {
         const exception = new Error(`Query ${key} is not allowed`);
@@ -43,41 +47,67 @@ router.get("/pokemons", (req, res, next) => {
     const { data, totalPokemon } = pokemonData;
     let offset = (page - 1) * limit;
     let totalPage = Math.ceil(totalPokemon / limit);
-    let newData = data.slice(offset, offset + limit);
     let count = data.length;
     let result = [];
-    result = data;
+    // result = data;
+
+    // if (filterkey.length) {
+    //   // pokemonData.data = pokemonData.data.filter((poke) => {
+    //   //   const hasSearch = filterquery.search
+    //   //     ? poke.name.includes(filterquery.search.toLowerCase())
+    //   //     : true;
+    //   //   const hasType = filter.type
+    //   //     ? poke.type.includes(filterquery.type.toLowerCase())
+    //   //     : true;
+    //   //   return hasSearch && hasType;
+    //   // });
+    //   if (filterquery.type) {
+    //     result = result
+    //       .filter((pokemon) => pokemon.type.find((e) => e === filterquery.type))
+    //       .slice(offset, offset + limit);
+    //   }
+    //   if (filterquery.search) {
+    //     result = result
+    //       .filter((pokemon) => {
+    //         if (pokemon.types.find((e) => e === filterquery.search)) {
+    //           return pokemon;
+    //         } else {
+    //           return pokemon.name.toLowerCase().includes(filterquery.search);
+    //         }
+    //       })
+    //       .slice(offset, offset + limit);
+    //   }
+    // }
 
     if (filterkey.length) {
-      // pokemonData.data = pokemonData.data.filter((poke) => {
-      //   const hasSearch = filterquery.search
-      //     ? poke.name.includes(filterquery.search.toLowerCase())
-      //     : true;
-      //   const hasType = filter.type
-      //     ? poke.type.includes(filterquery.type.toLowerCase())
-      //     : true;
-      //   return hasSearch && hasType;
-      // });
-      if (filterquery.type) {
-        result = result
-          .filter((pokemon) => pokemon.type.find((e) => e === filterquery.type))
-          .slice(offset, offset + limit);
-      }
-      if (filterquery.search) {
-        result = result
-          .filter((pokemon) => {
-            if (pokemon.type.find((e) => e === filterquery.search)) {
-              return pokemon;
-            } else {
-              return pokemon.name.toLowerCase().includes(filterquery.search);
-            }
-          })
-          .slice(offset, offset + limit);
-      }
+      filterkey.forEach((key) => {
+        if (key === "search") {
+          result = result = result.length
+            ? result
+                .filter((poke) => poke.name, includes(filterquery[key]))
+                .slice(offset, offset + limit)
+            : data
+                .filter((poke) => poke.name.includes(filterquery[key]))
+                .slice(offset, offset + limit);
+        }
+        if (key === "type") {
+          result = result.length
+            ? result
+                .filter((poke) =>
+                  poke.types.find((e) => e === filterquery[key])
+                )
+                .slice(offset, offset + limit)
+            : data
+                .filter((poke) =>
+                  poke.types.find((e) => e === filterquery[key])
+                )
+                .slice(offset, offset + limit);
+        }
+      });
+    } else {
+      result = data.slice(offset, offset + limit);
     }
-    res
-      .status(200)
-      .send({ data: newData, listResult: result, totalPage: totalPage, count });
+    res.status(200).send({ data: result, totalPage, count });
   } catch (error) {
     next(error);
   }
@@ -86,7 +116,6 @@ router.get("/pokemons", (req, res, next) => {
 router.get("/pokemons/:id", (req, res, next) => {
   try {
     const id = req.params.id;
-    console.log(req.query);
     let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
     const { data, totalPokemon } = pokemonData;
     let newData = {};
@@ -149,7 +178,7 @@ router.post("/pokemons", (req, res, next) => {
     const { data, totalPokemon } = pokemonData;
     const newPokemon = {
       name,
-      type: types,
+      types: types,
       url,
       id: parseInt(id),
     };
@@ -167,6 +196,18 @@ router.post("/pokemons", (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+router.put("/pokemons/:id", (req, res, next) => {
+  const { name, url, types } = req.body;
+  let pokeId = req.params.id;
+  pokeId = parseInt(pokeId);
+  let pokemonData = JSON.parse(fs.readFileSync("db.json", "utf-8"));
+  const { data, totalPokemon } = pokemonData;
+  let pokemon = data.map((poke) => poke.id === pokeId);
+  pokemon.name = name;
+  pokemon.types = types;
+  pokemon.url = url;
 });
 
 router.delete("/pokemons/:id", (req, res, next) => {
